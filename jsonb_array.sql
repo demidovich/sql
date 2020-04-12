@@ -1,66 +1,68 @@
 --
 -- Replace or add value to jsonb array
 --
-CREATE OR REPLACE FUNCTION jsonb_array_set(
-	input_json_array jsonb,
-	current_value text default null,
-	new_value text default null) 
-RETURNS jsonb AS $$
-DECLARE
-	buffer text[];
-BEGIN
+create or replace function jsonb_array_set(
+    input_json_array jsonb,
+    current_value text default null,
+    new_value text default null) 
+returns jsonb 
+language plpgsql immutable as $$
+declare
+    buffer text[];
+begin
 
-	IF jsonb_typeof(input_json_array) != 'array' THEN
-		RETURN input_json_array;
-	END IF;
+    if jsonb_typeof(input_json_array) != 'array' then
+            return input_json_array;
+    end if;
 
-	IF new_value IS NULL THEN
-		RETURN input_json_array;
-	END IF;
+    if new_value is null then
+        return input_json_array;
+    end if;
 
-	IF array_position(buffer, current_value) IS NULL THEN
-		RETURN input_json_array;
-	END IF;
+    if array_position(buffer, current_value) is null then
+        return input_json_array;
+    end if;
 
-	buffer := ARRAY(SELECT jsonb_array_elements_text(input_json_array));
+    buffer := array(select jsonb_array_elements_text(input_json_array));
 
-	IF current_value IS NOT NULL THEN
-		SELECT array_remove(buffer, current_value) INTO buffer;
-	END IF;
+    if current_value is not null then
+        select array_remove(buffer, current_value) into buffer;
+    end if;
 
-	SELECT array_append(buffer, new_value) INTO buffer;
+    select array_append(buffer, new_value) into buffer;
 
-	SELECT ARRAY(SELECT DISTINCT elem FROM unnest(buffer) AS elem ORDER BY elem) INTO buffer;
+    select array(select distinct elem from unnest(buffer) as elem order by elem) into buffer;
 
-	RETURN array_to_json(buffer);
+    return array_to_json(buffer);
 
-END;
-	$$ LANGUAGE PLPGSQL;
+end;
+$$;
 
 --
--- Delete value from jsonb array
+-- delete value from jsonb array
 --
-CREATE OR REPLACE FUNCTION jsonb_array_remove(
-	input_json_array jsonb,
-	delete_value text)
-RETURNS jsonb AS $$
-DECLARE
-	buffer text[];
-BEGIN
+create or replace function jsonb_array_remove(
+    input_json_array jsonb,
+    delete_value text)
+returns jsonb 
+language plpgsql immutable as $$
+declare
+    buffer text[];
+begin
 
-	IF jsonb_typeof(input_json_array) != 'array' THEN
-		RETURN input_json_array;
-	END IF;
+    if jsonb_typeof(input_json_array) != 'array' then
+            return input_json_array;
+    end if;
 
-	IF delete_value IS NULL THEN
-		RETURN input_json_array;
-	END IF;
+    if delete_value is null then
+            return input_json_array;
+    end if;
 
-	buffer := ARRAY(SELECT jsonb_array_elements_text(input_json_array));
+    buffer := array(select jsonb_array_elements_text(input_json_array));
 
-	SELECT array_remove(buffer, delete_value) INTO buffer;
+    select array_remove(buffer, delete_value) into buffer;
 
-	RETURN array_to_json(buffer);
+    return array_to_json(buffer);
 
-END;
-	$$ LANGUAGE PLPGSQL;
+end;
+$$;
