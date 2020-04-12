@@ -12,7 +12,7 @@ declare
 begin
 
     if jsonb_typeof(input_json_array) != 'array' then
-            return input_json_array;
+        return input_json_array;
     end if;
 
     if new_value is null then
@@ -51,11 +51,11 @@ declare
 begin
 
     if jsonb_typeof(input_json_array) != 'array' then
-            return input_json_array;
+        return input_json_array;
     end if;
 
     if delete_value is null then
-            return input_json_array;
+        return input_json_array;
     end if;
 
     buffer := array(select jsonb_array_elements_text(input_json_array));
