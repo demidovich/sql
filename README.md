@@ -110,3 +110,26 @@ SELECT obfuscate_text_ucfirst('This is private data');
  Fufrq Xwz Fcaz Gpdb
 ```
 
+## shard uniqid
+
+### shard_uniqid
+USAGE:
+
+```
+create sequence if not exists client_id_seq start 1;
+
+select shard_uniqid('client_id_seq');
+   shard_uniqid    
+-------------------
+ 21841628834627589
+```
+
+### shard_uniqid_fetch
+USAGE:
+
+```
+select shard_uniqid_fetch(21841628834627589);
+     shard_uniqid_fetch      
+-----------------------------
+ ("2020-04-27 14:13:21",1,5)
+```
